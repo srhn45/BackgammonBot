@@ -5,11 +5,11 @@ class ResidualBlock(nn.Module):
     def __init__(self):
         super().__init__()
         self.lin = nn.Sequential(
-            nn.Linear(64, 64),
-            nn.BatchNorm1d(64),
+            nn.Linear(256, 256),
+            nn.BatchNorm1d(256),
             nn.ReLU(),
-            nn.Linear(64, 64),
-            nn.BatchNorm1d(64),
+            nn.Linear(256, 256),
+            nn.BatchNorm1d(256),
         )
         self.relu = nn.ReLU()
 
@@ -20,7 +20,7 @@ class ResidualBlock(nn.Module):
 class BackModel(nn.Module):
     def __init__(self, num_classes=24*6, num_resnets=3, num_skips=2):
         super().__init__()
-        self.input = nn.Linear(33, 64)
+        self.input = nn.Linear(33, 256)
         self.relu = nn.ReLU()
         self.num_skips = num_skips
 
@@ -30,8 +30,8 @@ class BackModel(nn.Module):
             group = nn.Sequential(*[ResidualBlock() for _ in range(num_resnets)])
             self.resnets.append(group)
 
-        self.move = nn.Linear(64, num_classes)
-        self.evaluator = nn.Linear(64, 1)
+        self.move = nn.Linear(256, num_classes)
+        self.evaluator = nn.Linear(256, 1)
 
         for layer in [self.evaluator, self.move]:
             nn.init.xavier_uniform_(layer.weight)
