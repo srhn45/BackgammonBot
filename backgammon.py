@@ -53,6 +53,10 @@ class Game:
         if self.broken_pieces[self.current_player] > 0:
             if start != -1:
                 raise ValueError("Must place broken pieces first.")
+            
+            if self.current_player == 1:
+                end = die-1
+
             self.broken_pieces[self.current_player] -= 1
             if self.board.board[end] * -self.current_player == 1:
                 self.broken_pieces[-self.current_player] += 1
@@ -83,7 +87,7 @@ class Game:
         moves = self.dice.copy()
         if self.broken_pieces[self.current_player] > 0:
             for die in set(moves):
-                if self.board.board[die if self.current_player == 1 else 24 - die] * -self.current_player < 2:
+                if self.board.board[die-1 if self.current_player == 1 else 24 - die] * -self.current_player < 2:
                     self.legal_moves.append((-1, die if self.current_player == 1 else 24 - die, die))
             return self.legal_moves
 
