@@ -37,8 +37,8 @@ class MCTSNode:
         return self.children[np.argmax(scores)]
 
     def expand(self, model, add_dirichlet_noise=False, eps=0.25, alpha=0.3):
-        model.to("cuda")
-        move_probs, _ = model(self.state.get_input_matrix().to("cuda").unsqueeze(0))
+        model.to("cuda" if torch.cuda.is_available() else "cpu")
+        move_probs, _ = model(self.state.get_input_matrix().to("cuda" if torch.cuda.is_available() else "cpu").unsqueeze(0))
         move_probs = torch.exp(move_probs).squeeze().detach().cpu().numpy()
 
         legal_indices = []
