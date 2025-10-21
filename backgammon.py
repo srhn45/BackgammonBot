@@ -24,6 +24,11 @@ class BackgammonBoard:
         print("-" * 35)
         print(bottom_row)
         print("        Bottom (Points 12-1)")
+        
+    def clone(self):
+        new_board = BackgammonBoard()
+        new_board.board = self.board.copy()
+        return new_board
 
 class Game:
     def __init__(self, starting_board: BackgammonBoard = None):
@@ -145,3 +150,12 @@ class Game:
             input_matrix[29+i] = self.dice[i] if i < len(self.dice) else 0
 
         return torch.tensor(input_matrix, dtype=torch.float32)
+    
+    def clone(self):
+        new_game = Game(starting_board=self.board.clone())
+        new_game.current_player = self.current_player
+        new_game.game_over = self.game_over
+        new_game.dice = self.dice.copy()
+        new_game.broken_pieces = self.broken_pieces.copy()
+        new_game.collected_pieces = self.collected_pieces.copy()
+        return new_game
