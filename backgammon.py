@@ -136,20 +136,35 @@ class Game:
             start = -1
             end, die = move+1 if self.current_player == 1 else 24-(move+1), move
     
-    def get_input_matrix(self):
-        input_matrix = np.zeros(24+1+2+2+4) # 24 points + 1 for current player + 2 for broken pieces + 2 for collected pieces + 4 for dice
-        for i in range(24):
-            input_matrix[i] = self.board.board[i]
+    #def get_input_matrix(self):
+        #input_matrix = np.zeros(24+1+2+2+4) # 24 points + 1 for current player + 2 for broken pieces + 2 for collected pieces + 4 for dice
+        #for i in range(24):
+        #    input_matrix[i] = self.board.board[i]
         
-        input_matrix[24] = self.current_player
-        input_matrix[25] = self.broken_pieces[1]
-        input_matrix[26] = self.broken_pieces[-1]
-        input_matrix[27] = self.collected_pieces[1]
-        input_matrix[28] = self.collected_pieces[-1]
-        for i in range(4):
-            input_matrix[29+i] = self.dice[i] if i < len(self.dice) else 0
+        #input_matrix[24] = self.current_player
+        #input_matrix[25] = self.broken_pieces[1]
+        #input_matrix[26] = self.broken_pieces[-1]
+        #input_matrix[27] = self.collected_pieces[1]
+        #input_matrix[28] = self.collected_pieces[-1]
+        #for i in range(4):
+        #    input_matrix[29+i] = self.dice[i] if i < len(self.dice) else 0
 
-        return torch.tensor(input_matrix, dtype=torch.float32)
+        #return torch.tensor(input_matrix, dtype=torch.float32)
+        
+    def get_input_matrix(self):
+        input_matrix = torch.zeros(33, dtype=torch.float32)  # 24+1+2+2+4
+
+        input_matrix[:24] = torch.tensor(self.board.board, dtype=torch.float32)
+        input_matrix[24] = float(self.current_player)
+        input_matrix[25] = float(self.broken_pieces[1])
+        input_matrix[26] = float(self.broken_pieces[-1])
+        input_matrix[27] = float(self.collected_pieces[1])
+        input_matrix[28] = float(self.collected_pieces[-1])
+
+        for i in range(len(self.dice)):
+            input_matrix[29 + i] = float(self.dice[i])
+
+        return input_matrix
     
     def clone(self):
         new_game = Game(starting_board=self.board.clone())
@@ -158,4 +173,5 @@ class Game:
         new_game.dice = self.dice.copy()
         new_game.broken_pieces = self.broken_pieces.copy()
         new_game.collected_pieces = self.collected_pieces.copy()
+        new_game.get_legal_moves()  # recompute legal moves
         return new_game
