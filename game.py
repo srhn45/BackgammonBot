@@ -57,6 +57,7 @@ class MCTSNode:
     def expand(self, model, add_dirichlet_noise=False, eps=0.25, alpha=0.3):
         device = next(model.parameters()).device 
         
+        model.eval()
         with torch.no_grad():
             move_probs, _ = model(self.state.get_input_matrix().to(device).unsqueeze(0))
             move_probs = torch.exp(move_probs).squeeze().cpu().numpy()
@@ -129,6 +130,7 @@ class MCTS_Searcher:
             if not legal_moves:
                 break
             
+            self.model.eval()
             with torch.no_grad():
                 move_probs, value = self.model(current_state.get_input_matrix().to(self.device).unsqueeze(0))   
                 move_probs = torch.exp(move_probs).squeeze()
@@ -169,11 +171,13 @@ model.load_state_dict(torch.load("model.pth", map_location=device))
 optimizer = torch.optim.AdamW(model.parameters(), lr=0.001)
 scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=100, gamma=0.999)
 
+print('starting training')
+
 for epoch in range(1000):
     buffer = []
-    searcher = MCTS_Searcher(model=model, n_simulations=400)
+    searcher = MCTS_Searcher(model=model, n_simulations=500)
 
-    loader = tqdm(range(0, 500))
+    loader = tqdm(range(0, 1000))
     for i in loader:
         positions = []
         backgame = Game()
